@@ -1,0 +1,1750 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>EMPIRO</title>
+<style>
+/* ==========================================================================
+   EMPIRO — style.css
+   Dark, futuristic HUD with a premium business-dashboard side panel.
+   Layout: wide screens = map + side panel; phones = map above, panel below.
+   ========================================================================== */
+
+:root {
+  --bg: #080a12;
+  --panel: rgba(12, 17, 30, 0.92);
+  --card: #121a2c;
+  --line: #1d2a44;
+  --text: #e8f1ff;
+  --muted: #7f8cab;
+  --cyan: #00e5ff;
+  --gold: #ffc83d;
+  --good: #3ddc97;
+  --bad: #ff5d6c;
+  --violet: #8b7bff;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+input { user-select: text; }
+
+/* ---------- HUD bar ---------- */
+.hud {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 14px;
+  background: linear-gradient(90deg, #0c1224, #0a0f1d);
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.brand {
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: var(--cyan);
+  text-shadow: 0 0 12px rgba(0, 229, 255, 0.4);
+  font-size: 18px;
+}
+.brand small {
+  color: var(--muted);
+  letter-spacing: 1px;
+  font-weight: 600;
+  font-size: 10px;
+  margin-left: 6px;
+}
+.stat { display: flex; flex-direction: column; min-width: 70px; }
+.stat b { font-size: 15px; font-variant-numeric: tabular-nums; }
+.label { font-size: 10px; letter-spacing: 1.5px; color: var(--muted); }
+.clock { color: var(--gold); }
+.money b { color: var(--good); }
+.neg { color: var(--bad) !important; }
+
+.meter {
+  width: 110px;
+  height: 8px;
+  background: #1a2238;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.fill { height: 100%; width: 0; border-radius: 6px; transition: width 0.25s; }
+.fill.energy { background: linear-gradient(90deg, #00b3ff, #00e5ff); }
+.fill.rep { background: linear-gradient(90deg, #8b7bff, #c59bff); }
+.fill.xp { background: linear-gradient(90deg, #ffc83d, #ff9f1c); }
+
+.actions { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  background: #16203a;
+  border: 1px solid var(--line);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  min-height: 44px;
+  touch-action: manipulation;
+  transition: transform 0.08s, opacity 0.2s;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn.gold {
+  background: linear-gradient(135deg, #ffd54a, #ff9f1c);
+  color: #1b1200;
+  border-color: #ffb020;
+}
+.btn.danger { background: #3a1420; border-color: #6b2232; color: #ffb3bc; }
+.btn.ghost { background: transparent; }
+.btn.wide { width: 100%; margin-top: 4px; }
+
+/* ---------- Layout ---------- */
+.layout { flex: 1; display: flex; min-height: 0; }
+
+.world {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: #05070d;
+}
+#world {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+.here-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(8, 10, 18, 0.8);
+  border: 1px solid var(--line);
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  backdrop-filter: blur(4px);
+}
+#minimap {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 168px;
+  height: 108px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  opacity: 0.92;
+}
+
+/* Touch controls */
+.joystick {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: rgba(15, 20, 32, 0.55);
+  border: 2px solid rgba(0, 229, 255, 0.35);
+  touch-action: none;
+}
+.knob {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #8ff3ff, #00a6c9);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 14px rgba(0, 229, 255, 0.55);
+  pointer-events: none;
+}
+.run-btn {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  background: rgba(40, 30, 8, 0.6);
+  color: var(--gold);
+  font-weight: 800;
+  letter-spacing: 1px;
+  touch-action: none;
+}
+.run-btn.on { background: var(--gold); color: #1b1200; }
+
+.toast {
+  position: absolute;
+  left: 50%;
+  top: 60px;
+  transform: translateX(-50%);
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+  max-width: 90%;
+  text-align: center;
+  z-index: 5;
+  border: 1px solid var(--line);
+  background: #0c1224;
+}
+.toast.show { opacity: 1; }
+.toast.good { border-color: var(--good); color: var(--good); }
+.toast.bad { border-color: var(--bad); color: #ffb3bc; }
+
+/* ---------- Side panel ---------- */
+.panel {
+  width: 360px;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border-left: 1px solid var(--line);
+  min-height: 0;
+}
+.tabs { display: flex; border-bottom: 1px solid var(--line); }
+.tab {
+  flex: 1;
+  background: none;
+  border: 0;
+  color: var(--muted);
+  padding: 14px 4px;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 44px;
+  border-bottom: 2px solid transparent;
+}
+.tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+.tab-body { overflow-y: auto; padding: 12px; flex: 1; min-height: 0; }
+
+.section-head h2 { margin: 4px 0 2px; font-size: 20px; color: var(--gold); }
+h3 {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 16px 0 8px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.card.active { border-color: var(--cyan); }
+.card-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.pill {
+  background: #0e2a22;
+  color: var(--good);
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.kv-row { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; }
+.kv-row b { font-variant-numeric: tabular-nums; text-align: right; }
+.muted { color: var(--muted); }
+.small { font-size: 12px; }
+.hint { font-size: 12px; color: var(--muted); }
+.good { color: var(--good) !important; }
+.bad { color: var(--bad) !important; }
+.locked-line { color: var(--muted); font-size: 14px; }
+
+.input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #0b1020;
+  color: var(--text);
+  font-size: 16px;
+}
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.bar.thin { height: 6px; background: #1a2238; border-radius: 4px; overflow: hidden; }
+
+.stage {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 6px 4px;
+  font-size: 14px;
+  border-radius: 8px;
+}
+.stage span {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  background: #1a2238;
+  flex-shrink: 0;
+}
+.stage.done span { background: var(--good); color: #04180f; }
+.stage.now { background: #0f2a33; }
+.stage.now span { background: var(--cyan); color: #001318; }
+.stage.locked { opacity: 0.45; }
+.stage em { font-size: 11px; color: var(--violet); font-style: normal; margin-left: 4px; }
+
+.log {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 12px;
+  color: #b8c4e0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 5, 10, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  padding: 16px;
+}
+.modal-card {
+  width: min(420px, 100%);
+  background: #0f1628;
+  border: 1px solid var(--gold);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 0 40px rgba(255, 200, 61, 0.2);
+  max-height: 90vh;
+  overflow: auto;
+}
+.modal-card h2 { margin: 0 0 12px; color: var(--gold); }
+.modal-card hr { border: 0; border-top: 1px solid var(--line); margin: 10px 0; }
+.modal-card .row, .modal-card .kv-row { margin-bottom: 6px; }
+.modal-card .btn { width: 100%; margin-top: 12px; }
+
+.hidden { display: none !important; }
+
+/* ---------- Phones / small screens ---------- */
+@media (max-width: 899px) {
+  .layout { flex-direction: column; }
+  .panel { width: 100%; height: 42%; border-left: 0; border-top: 1px solid var(--line); }
+  .stat { min-width: 60px; }
+  .meter { width: 80px; }
+  #minimap { width: 120px; height: 77px; }
+  .actions { width: 100%; margin-left: 0; }
+  .actions .btn { flex: 1; padding: 8px 6px; font-size: 13px; }
+}
+
+/* ---------- Desktop: keyboard only, hide touch controls ---------- */
+@media (hover: hover) and (pointer: fine) {
+  .joystick, .run-btn { display: none; }
+}
+
+</style>
+
+  <header class="hud">
+    <div class="brand">EMPIRO<small>PHASE 1</small></div>
+
+    <div class="stat">
+      <span class="label">DAY</span>
+      <b><span id="hud-day">1</span> · <span id="hud-clock" class="clock">06:00</span></b>
+    </div>
+
+    <div class="stat money">
+      <span class="label">CASH</span>
+      <b id="hud-cash">₹0</b>
+    </div>
+
+    <div class="stat money">
+      <span class="label">BANK</span>
+      <b id="hud-bank">₹0</b>
+    </div>
+
+    <div class="stat">
+      <span class="label">ENERGY <span id="hud-energy-txt"></span></span>
+      <div class="meter"><div id="hud-energy" class="fill energy"></div></div>
+    </div>
+
+    <div class="stat">
+      <span class="label">REPUTATION <span id="hud-rep-txt"></span></span>
+      <div class="meter"><div id="hud-rep" class="fill rep"></div></div>
+    </div>
+
+    <div class="stat">
+      <span class="label">STAGE</span>
+      <b id="hud-stage">—</b>
+    </div>
+
+    <div class="actions">
+      <button id="btn-endday" class="btn gold">End Day</button>
+      <button id="btn-save" class="btn">Save Game</button>
+      <button id="btn-load" class="btn">Load Game</button>
+      <button id="btn-new" class="btn danger">New Game</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section id="world-wrap" class="world">
+      <canvas id="world"></canvas>
+
+      <div class="here-badge">📍 <span id="hud-loc">Your Room</span></div>
+      <canvas id="minimap" width="168" height="108"></canvas>
+
+      <div id="joystick" class="joystick"><div class="knob"></div></div>
+      <button id="btn-run" class="run-btn">RUN</button>
+
+      <div id="toast" class="toast"></div>
+    </section>
+
+    <aside class="panel">
+      <nav class="tabs">
+        <button class="tab active" data-tab="here">Here</button>
+        <button class="tab" data-tab="money">Money</button>
+        <button class="tab" data-tab="career">Career</button>
+      </nav>
+      <div id="tab-here" class="tab-body"></div>
+      <div id="tab-money" class="tab-body hidden"></div>
+      <div id="tab-career" class="tab-body hidden"></div>
+    </aside>
+  </main>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <h2 id="modal-title">Day complete</h2>
+      <div id="modal-body"></div>
+      <button id="modal-close" class="btn gold">Continue</button>
+    </div>
+  </div>
+
+  
+  
+  
+
+<script>
+"use strict";
+/* ==========================================================================
+   EMPIRO — config.js
+   Static game data only: economy numbers, jobs, stages, locations and the
+   town map. Tune numbers here; the logic in game.js reads them.
+   ========================================================================== */
+
+// ---------- Money formatting (Indian Rupees, en-IN grouping) ----------
+const INR_FORMAT = new Intl.NumberFormat("en-IN", {
+  style: "currency",
+  currency: "INR",
+  maximumFractionDigits: 0
+});
+const formatINR = (n) => INR_FORMAT.format(Math.round(n) || 0);
+
+// ---------- Tuning ----------
+const CONFIG = Object.freeze({
+  TILE: 48,                   // pixels per map tile
+  START_CASH: 5000,           // ₹ in hand on day 1
+  LIVING_COST_PER_DAY: 180,   // ₹ rent + food, charged at day end
+  DAY_START: 6 * 60,          // 06:00 (minutes since midnight)
+  DAY_END: 24 * 60,           // midnight: you collapse and wake up at home
+  CLOCK_SPEED: 0.75,          // in-game minutes that pass per real second
+  MAX_ENERGY: 100,
+  WALK_SPEED: 120,            // px per second
+  RUN_SPEED: 210,             // px per second
+  WALK_ENERGY: 0.25,          // energy lost per second walking
+  RUN_ENERGY: 1.2,            // energy lost per second running
+  EXHAUSTED_SPEED: 0.5,       // speed multiplier when energy is 0
+  REST_MINUTES: 60,           // time spent on one rest
+  REST_ENERGY: 18,            // energy regained per rest
+  SLEEP_ENERGY_HOME: 70,      // energy regained by waking up at home
+  SLEEP_ENERGY_OUTSIDE: 40,   // energy regained after collapsing outside
+  BANK_GOAL: 2000,            // bank balance that unlocks Stage 3
+  SAVE_KEY: "empiro.save.v1",
+  REPUTATION: {
+    START: 50,
+    MIN: 0,
+    MAX: 100,
+    OPEN_GAIN: 1,             // per day the stall traded
+    MISSED_PENALTY: 2         // per day the stall stayed closed
+  },
+  STALL: {
+    INVESTMENT: 3000,         // ₹ to start the tea stall (from cash)
+    OPEN_MINUTES: 60,         // time spent opening up
+    OPEN_ENERGY: 8,           // energy spent opening up
+    PRICE: 15,                // ₹ per cup of chai
+    BASE_CUSTOMERS: 30,       // customers per day at level 1, reputation 50
+    STOCK_RATIO: 0.33,        // raw-material cost as a share of expected sales
+    MAX_LEVEL: 5,
+    LEVEL_BONUS: 0.2,         // +20% customers per level above 1
+    UPGRADE_BASE: 2000        // upgrade cost = UPGRADE_BASE × current level
+  },
+  XP_PER_JOB_LEVEL: 100,      // experience needed for each job level
+  RAISE_PER_JOB_LEVEL: 0.05   // +5% salary per job level above 1
+});
+
+// ---------- Jobs (hired at, and clocked in at, their workplace) ----------
+const JOBS = Object.freeze({
+  shop: {
+    id: "shop", name: "Shop Worker", location: "M",
+    salary: 700, hours: 8, energy: 30, xpGain: 12,
+    desc: "Stock shelves and serve customers at the Market."
+  },
+  workshop: {
+    id: "workshop", name: "Workshop Worker", location: "W",
+    salary: 900, hours: 9, energy: 40, xpGain: 15,
+    desc: "Assemble parts on the Workshop floor. Heavy, but well paid."
+  },
+  delivery: {
+    id: "delivery", name: "Delivery Worker", location: "O",
+    salary: 500, hours: 6, energy: 35, xpGain: 10,
+    desc: "Collect parcels from the Office hub and ride the routes."
+  }
+});
+
+// ---------- Progression stages (phase 2 entries are placeholders) ----------
+const STAGES = Object.freeze([
+  { id: 1, name: "Broke & Unemployed", phase: 1 },
+  { id: 2, name: "First Job", phase: 1 },
+  { id: 3, name: "Saving Money", phase: 1 },
+  { id: 4, name: "First Business", phase: 1 },
+  { id: 5, name: "Expansion", phase: 2 },
+  { id: 6, name: "Bigger Property", phase: 2 },
+  { id: 7, name: "First Factory", phase: 2 }
+]);
+
+// ---------- Interactive buildings (walkable, letter = tile code) ----------
+const LOCATIONS = Object.freeze({
+  R: { name: "Your Room", label: "ROOM", color: "#2d4f8a" },
+  M: { name: "Market", label: "MARKET", color: "#8a5a2b" },
+  W: { name: "Workshop", label: "WORKSHOP", color: "#4d535e" },
+  O: { name: "Office", label: "OFFICE", color: "#2b6e7c" },
+  B: { name: "Bank", label: "BANK", color: "#8c7a22" }
+});
+
+// ---------- Other tiles ----------
+// solid = blocks movement. Houses and small shops are decorative town scenery.
+const TILES = Object.freeze({
+  ".": { name: "Open ground", solid: false, color: "#2b5235" },
+  "=": { name: "Street", solid: false, color: "#3a3f4c" },
+  "h": { name: "Residential house", solid: true, color: "#8c6f5a", roof: "#5b3e2e" },
+  "k": { name: "Local shop", solid: true, color: "#6a58c8", roof: "#4a3c97" },
+  "t": { name: "Tree", solid: true, color: "#2b5235" }
+});
+
+// ---------- The town (28 × 18 tiles) ----------
+// R Room · M Market · W Workshop · O Office · B Bank · = road · . ground
+// h house · k shop · t tree
+const MAP_ROWS = [
+  "tttttttttttttttttttttttttttt",
+  "..hh..hh....==..kk..BBBB....",
+  "..RRRR..hh..==..kkk.BBBB....",
+  "..RRRR......==......BBBB....",
+  "..hh..t.hh..==..OOOOOO......",
+  "....t.hh....==..OOOOOO......",
+  "...t........==..OOOOOO......",
+  "hh....hh....==..............",
+  "============================",
+  "============================",
+  "..MMMMMMMM..==..hh....hh....",
+  "..MMMMMMMM..==..WWWWWWWW....",
+  "..MMMMMMMM..==..WWWWWWWW....",
+  "..MMMMMMMM..==..WWWWWWWW....",
+  "....kk..kk..==..t.......t...",
+  "..kk..kk....==..hh...hh.....",
+  "tt..........==..............",
+  "tttttttttttttttttttttttttttt"
+];
+
+</script>
+<script>
+"use strict";
+/* ==========================================================================
+   EMPIRO — game.js
+   Core simulation: clock, movement + collision, jobs, the tea stall, the
+   bank, end-of-day settlement, stages, save / load.
+   Pure logic with no DOM access. ui.js reads Game.state and calls actions.
+   Every action returns { ok: boolean, msg: string }.
+   ========================================================================== */
+
+const Game = (() => {
+  // ----- Map (built from MAP_ROWS in config.js) -----
+  const ROWS = MAP_ROWS.length;
+  const COLS = Math.max(...MAP_ROWS.map((r) => r.length));
+  const MAP = MAP_ROWS.map((r) => r.padEnd(COLS, "t").split(""));
+  const WORLD_W = COLS * CONFIG.TILE;
+  const WORLD_H = ROWS * CONFIG.TILE;
+  const PLAYER_RADIUS = 11;
+  const ROOM_SPAWN = { x: 4.5 * CONFIG.TILE, y: 2.5 * CONFIG.TILE };
+
+  // ----- Helpers -----
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const ok = (msg) => ({ ok: true, msg });
+  const fail = (msg) => ({ ok: false, msg });
+  const pad2 = (n) => String(n).padStart(2, "0");
+  const clockText = (minutes) => {
+    const t = Math.floor(minutes);
+    return `${pad2(Math.floor(t / 60) % 24)}:${pad2(t % 60)}`;
+  };
+  const parseAmount = (v) => {
+    const n = Math.floor(Number(v));
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  // ----- State -----
+  const freshState = () => ({
+    day: 1,
+    clock: CONFIG.DAY_START,
+    cash: CONFIG.START_CASH,
+    bank: 0,
+    energy: CONFIG.MAX_ENERGY,
+    reputation: CONFIG.REPUTATION.START,
+    x: ROOM_SPAWN.x,
+    y: ROOM_SPAWN.y,
+    job: null,            // { id, xp, lastWorkedDay }
+    everEmployed: false,
+    everSaved: false,
+    stall: null,          // { level, openedDay, stockCost, invested, totalSales, totalProfit, totalCustomers, daysOpen, lastReport }
+    stage: 1,
+    today: { jobPay: 0, sales: 0, stock: 0 },
+    stats: { totalEarned: 0, shifts: 0, daysCompleted: 0 },
+    lastSummary: null,
+    log: []
+  });
+  let S = freshState();
+
+  // ----- Map queries -----
+  function tileAt(x, y) {
+    const c = Math.floor(x / CONFIG.TILE);
+    const r = Math.floor(y / CONFIG.TILE);
+    if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return "t";
+    return MAP[r][c];
+  }
+  const isSolid = (ch) => Boolean(TILES[ch] && TILES[ch].solid);
+
+  function blocked(x, y) {
+    const r = PLAYER_RADIUS;
+    return isSolid(tileAt(x - r, y - r)) || isSolid(tileAt(x + r, y - r)) ||
+           isSolid(tileAt(x - r, y + r)) || isSolid(tileAt(x + r, y + r));
+  }
+
+  // Building key ("R", "M", ...) under the player, or null.
+  function here() {
+    const ch = tileAt(S.x, S.y);
+    return LOCATIONS[ch] ? ch : null;
+  }
+
+  function hereName() {
+    const ch = tileAt(S.x, S.y);
+    if (LOCATIONS[ch]) return LOCATIONS[ch].name;
+    return TILES[ch] ? TILES[ch].name : "Street";
+  }
+
+  // ----- Economy helpers -----
+  function note(msg) {
+    S.log.unshift(`Day ${S.day} · ${clockText(S.clock)} — ${msg}`);
+    if (S.log.length > 40) S.log.length = 40;
+  }
+
+  function advanceClock(minutes) { S.clock += minutes; }
+
+  function setReputation(delta) {
+    S.reputation = clamp(S.reputation + delta, CONFIG.REPUTATION.MIN, CONFIG.REPUTATION.MAX);
+  }
+
+  function jobLevel(job) {
+    return 1 + Math.floor(job.xp / CONFIG.XP_PER_JOB_LEVEL);
+  }
+
+  function jobSalary(job) {
+    const base = JOBS[job.id].salary;
+    return Math.round(base * (1 + CONFIG.RAISE_PER_JOB_LEVEL * (jobLevel(job) - 1)));
+  }
+
+  // What today's stall should earn, before the random customer swing.
+  function stallExpected() {
+    const st = S.stall;
+    const c = CONFIG.STALL;
+    const customers = c.BASE_CUSTOMERS * (1 + c.LEVEL_BONUS * (st.level - 1)) * (0.5 + S.reputation / 100);
+    const sales = customers * c.PRICE;
+    return {
+      customers: Math.round(customers),
+      sales: Math.round(sales),
+      stock: Math.round(sales * c.STOCK_RATIO)
+    };
+  }
+
+  // Stage is the highest milestone reached; it never goes back down.
+  function updateStage() {
+    if (S.bank >= CONFIG.BANK_GOAL) S.everSaved = true;
+    let s = 1;
+    if (S.everEmployed) s = 2;
+    if (S.everSaved) s = 3;
+    if (S.stall) s = 4;
+    S.stage = Math.max(S.stage, s);
+  }
+
+  // ----- Simulation tick (called every frame by ui.js) -----
+  // input = { x: -1..1, y: -1..1, run: boolean }
+  // Returns { summary } when the day ends automatically at midnight, else null.
+  function update(dt, input) {
+    advanceClock(dt * CONFIG.CLOCK_SPEED);
+
+    const mx = input.x || 0;
+    const my = input.y || 0;
+    const mag = Math.hypot(mx, my);
+    if (mag > 0.01) {
+      const exhausted = S.energy <= 0;
+      const running = Boolean(input.run) && !exhausted;
+      let speed = running ? CONFIG.RUN_SPEED : CONFIG.WALK_SPEED;
+      if (exhausted) speed *= CONFIG.EXHAUSTED_SPEED;
+
+      const step = (Math.min(1, mag) / mag) * speed * dt;
+      const sx = mx * step;
+      const sy = my * step;
+      // Move each axis separately so the player slides along walls.
+      if (!blocked(S.x + sx, S.y)) S.x += sx;
+      if (!blocked(S.x, S.y + sy)) S.y += sy;
+
+      const cost = (running ? CONFIG.RUN_ENERGY : CONFIG.WALK_ENERGY) * dt;
+      S.energy = Math.max(0, S.energy - cost);
+    }
+
+    if (S.clock >= CONFIG.DAY_END) return { summary: endDay() };
+    return null;
+  }
+
+  // ----- Actions -----
+
+  function rest() {
+    if (here() !== "R") return fail("Go to your Room to rest.");
+    if (S.energy >= CONFIG.MAX_ENERGY) return fail("You are already fully rested.");
+    S.energy = Math.min(CONFIG.MAX_ENERGY, S.energy + CONFIG.REST_ENERGY);
+    advanceClock(CONFIG.REST_MINUTES);
+    note(`Rested for an hour (+${CONFIG.REST_ENERGY} energy).`);
+    return ok(`Rested. Energy +${CONFIG.REST_ENERGY}.`);
+  }
+
+  function applyForJob(jobId) {
+    const job = JOBS[jobId];
+    if (!job) return fail("Unknown job.");
+    if (S.job) return fail(`You already work as a ${JOBS[S.job.id].name}. Quit before applying elsewhere.`);
+    if (here() !== job.location) return fail(`Travel to the ${LOCATIONS[job.location].name} to apply.`);
+    S.job = { id: jobId, xp: 0, lastWorkedDay: 0 };
+    S.everEmployed = true;
+    updateStage();
+    note(`Hired as ${job.name} at the ${LOCATIONS[job.location].name}.`);
+    return ok(`Hired! You are now a ${job.name}.`);
+  }
+
+  function quitJob() {
+    if (!S.job) return fail("You don't have a job to quit.");
+    const name = JOBS[S.job.id].name;
+    S.job = null;
+    note(`Quit as ${name}.`);
+    return ok(`You quit your job as ${name}.`);
+  }
+
+  function workShift() {
+    if (!S.job) return fail("You have no job. Find one at the right location.");
+    const job = JOBS[S.job.id];
+    if (here() !== job.location) return fail(`Go to the ${LOCATIONS[job.location].name} to clock in.`);
+    if (S.job.lastWorkedDay === S.day) return fail("You already worked your shift today.");
+    if (S.energy < job.energy) return fail(`Too tired (needs ${job.energy} energy). Rest first.`);
+    if (S.clock + job.hours * 60 > CONFIG.DAY_END) return fail("Not enough time left today for a full shift.");
+
+    const pay = jobSalary(S.job);
+    const levelBefore = jobLevel(S.job);
+
+    S.cash += pay;
+    S.today.jobPay += pay;
+    S.stats.totalEarned += pay;
+    S.stats.shifts += 1;
+    S.energy = Math.max(0, S.energy - job.energy);
+    advanceClock(job.hours * 60);
+    S.job.lastWorkedDay = S.day;
+    S.job.xp += job.xpGain;
+
+    const levelAfter = jobLevel(S.job);
+    note(`Completed a ${job.hours}-hour shift as ${job.name}: +${formatINR(pay)}.`);
+    if (levelAfter > levelBefore) note(`Promoted to ${job.name} level ${levelAfter}!`);
+    updateStage();
+    return ok(`Shift complete: +${formatINR(pay)}`);
+  }
+
+  // ----- Tea stall -----
+
+  function startStall() {
+    if (here() !== "M") return fail("Go to the Market to start a tea stall.");
+    if (S.stall) return fail("You already run a tea stall.");
+    if (!S.everEmployed) return fail("Earn your first salary before investing in a business.");
+    const inv = CONFIG.STALL.INVESTMENT;
+    if (S.cash < inv) return fail(`You need ${formatINR(inv)} cash. You have ${formatINR(S.cash)}.`);
+
+    S.cash -= inv;
+    S.stall = {
+      level: 1,
+      openedDay: 0,
+      stockCost: 0,
+      invested: inv,
+      totalSales: 0,
+      totalProfit: 0,
+      totalCustomers: 0,
+      daysOpen: 0,
+      lastReport: null
+    };
+    updateStage();
+    note(`Invested ${formatINR(inv)} to start a tea stall in the Market.`);
+    return ok("Tea stall launched! Open it every morning from the Market.");
+  }
+
+  function openStall() {
+    const st = S.stall;
+    if (!st) return fail("You don't have a tea stall yet.");
+    if (here() !== "M") return fail("Go to the Market to open your stall.");
+    if (st.openedDay === S.day) return fail("Your stall is already open today.");
+    if (S.energy < CONFIG.STALL.OPEN_ENERGY) return fail("Too tired to open up. Rest first.");
+
+    const exp = stallExpected();
+    if (S.cash < exp.stock) return fail(`You need ${formatINR(exp.stock)} cash for today's stock.`);
+
+    S.cash -= exp.stock;
+    S.today.stock += exp.stock;
+    st.stockCost = exp.stock;
+    st.openedDay = S.day;
+    S.energy = Math.max(0, S.energy - CONFIG.STALL.OPEN_ENERGY);
+    advanceClock(CONFIG.STALL.OPEN_MINUTES);
+    note(`Opened the tea stall. Bought stock for ${formatINR(exp.stock)}.`);
+    return ok(`Stall open! Stock cost ${formatINR(exp.stock)}.`);
+  }
+
+  function upgradeStall() {
+    const st = S.stall;
+    if (!st) return fail("You don't have a tea stall yet.");
+    if (here() !== "M") return fail("Stall upgrades are arranged at the Market.");
+    if (st.level >= CONFIG.STALL.MAX_LEVEL) return fail("Your stall is already at the top level.");
+
+    const cost = CONFIG.STALL.UPGRADE_BASE * st.level;
+    if (S.cash < cost) return fail(`The upgrade costs ${formatINR(cost)}. You have ${formatINR(S.cash)}.`);
+
+    S.cash -= cost;
+    st.invested += cost;
+    st.level += 1;
+    note(`Upgraded the tea stall to level ${st.level} for ${formatINR(cost)}.`);
+    return ok(`Stall upgraded to level ${st.level}. More customers now.`);
+  }
+
+  // ----- Bank -----
+
+  function deposit(amount) {
+    if (here() !== "B") return fail("Go to the Bank to deposit money.");
+    const amt = parseAmount(amount);
+    if (amt <= 0) return fail("Enter an amount above ₹0.");
+    if (amt > S.cash) return fail("You don't have that much cash.");
+    S.cash -= amt;
+    S.bank += amt;
+    updateStage();
+    note(`Deposited ${formatINR(amt)} in the bank.`);
+    return ok(`Deposited ${formatINR(amt)}.`);
+  }
+
+  function withdraw(amount) {
+    if (here() !== "B") return fail("Go to the Bank to withdraw money.");
+    const amt = parseAmount(amount);
+    if (amt <= 0) return fail("Enter an amount above ₹0.");
+    if (amt > S.bank) return fail("Not enough money in the bank.");
+    S.bank -= amt;
+    S.cash += amt;
+    note(`Withdrew ${formatINR(amt)} from the bank.`);
+    return ok(`Withdrew ${formatINR(amt)}.`);
+  }
+
+  function depositAll() { return deposit(S.cash); }
+  function withdrawAll() { return withdraw(S.bank); }
+
+  // ----- End of day -----
+  // Charges living costs, settles the tea stall, resets the clock and wakes
+  // the player at home. Returns a summary object for the UI.
+  function endDay() {
+    const outside = here() !== "R";
+    const dayNo = S.day;
+
+    // 1) Living costs: cash first, then bank, any shortfall becomes debt.
+    let due = CONFIG.LIVING_COST_PER_DAY;
+    const fromCash = Math.min(Math.max(S.cash, 0), due);
+    S.cash -= fromCash;
+    due -= fromCash;
+    const fromBank = Math.min(Math.max(S.bank, 0), due);
+    S.bank -= fromBank;
+    due -= fromBank;
+    S.cash -= due;
+
+    // 2) Tea stall: sell today's chai if the stall was opened.
+    let stallReport = null;
+    if (S.stall) {
+      const st = S.stall;
+      if (st.openedDay === dayNo) {
+        const exp = stallExpected();
+        const customers = Math.max(0, Math.round(exp.customers * (0.85 + Math.random() * 0.3)));
+        const sales = customers * CONFIG.STALL.PRICE;
+        const profit = sales - st.stockCost;
+        S.cash += sales;
+        S.today.sales += sales;
+        st.totalSales += sales;
+        st.totalProfit += profit;
+        st.totalCustomers += customers;
+        st.daysOpen += 1;
+        stallReport = { opened: true, customers, sales, stock: st.stockCost, profit };
+        setReputation(CONFIG.REPUTATION.OPEN_GAIN);
+      } else {
+        stallReport = { opened: false, customers: 0, sales: 0, stock: 0, profit: 0 };
+        setReputation(-CONFIG.REPUTATION.MISSED_PENALTY);
+      }
+      st.stockCost = 0;
+      st.lastReport = stallReport;
+    }
+
+    // 3) Build the summary.
+    const income = S.today.jobPay + S.today.sales;
+    const expenses = S.today.stock + CONFIG.LIVING_COST_PER_DAY;
+    const summary = {
+      day: dayNo,
+      jobPay: S.today.jobPay,
+      sales: S.today.sales,
+      stock: S.today.stock,
+      living: CONFIG.LIVING_COST_PER_DAY,
+      income,
+      expenses,
+      net: income - expenses,
+      stall: stallReport,
+      outside,
+      cash: S.cash,
+      bank: S.bank,
+      reputation: S.reputation
+    };
+
+    // 4) Next morning.
+    const netText = (summary.net >= 0 ? "+" : "−") + formatINR(Math.abs(summary.net));
+    note(`Day ${dayNo} closed. Net ${netText}.`);
+    S.stats.daysCompleted += 1;
+    S.lastSummary = summary;
+    S.day += 1;
+    S.clock = CONFIG.DAY_START;
+    S.energy = clamp(S.energy + (outside ? CONFIG.SLEEP_ENERGY_OUTSIDE : CONFIG.SLEEP_ENERGY_HOME), 0, CONFIG.MAX_ENERGY);
+    S.x = ROOM_SPAWN.x;
+    S.y = ROOM_SPAWN.y;
+    S.today = { jobPay: 0, sales: 0, stock: 0 };
+    updateStage();
+    return summary;
+  }
+
+  // ----- Save / load -----
+
+  // Validates loaded data and fills in anything missing. Returns null if unusable.
+  function sanitize(raw) {
+    if (!raw || typeof raw !== "object") return null;
+    const s = Object.assign(freshState(), raw);
+    for (const k of ["day", "clock", "cash", "bank", "energy", "reputation", "x", "y"]) {
+      if (typeof s[k] !== "number" || !Number.isFinite(s[k])) return null;
+    }
+    s.energy = clamp(s.energy, 0, CONFIG.MAX_ENERGY);
+    s.reputation = clamp(s.reputation, CONFIG.REPUTATION.MIN, CONFIG.REPUTATION.MAX);
+    if (s.job && !JOBS[s.job.id]) s.job = null;
+    if (s.stall && typeof s.stall.level !== "number") s.stall = null;
+    s.today = Object.assign({ jobPay: 0, sales: 0, stock: 0 }, s.today);
+    s.stats = Object.assign({ totalEarned: 0, shifts: 0, daysCompleted: 0 }, s.stats);
+    if (!Array.isArray(s.log)) s.log = [];
+    if (blocked(s.x, s.y)) {
+      s.x = ROOM_SPAWN.x;
+      s.y = ROOM_SPAWN.y;
+    }
+    return s;
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(CONFIG.SAVE_KEY, JSON.stringify({ version: 1, savedAt: Date.now(), state: S }));
+      note("Game saved.");
+      return ok("Game saved in this browser.");
+    } catch (err) {
+      return fail("Could not save: " + err.message);
+    }
+  }
+
+  function load() {
+    let raw;
+    try {
+      raw = localStorage.getItem(CONFIG.SAVE_KEY);
+    } catch (err) {
+      return fail("Browser storage is unavailable: " + err.message);
+    }
+    if (!raw) return fail("No saved game found.");
+    try {
+      const data = JSON.parse(raw);
+      const next = sanitize(data && data.state);
+      if (!next) return fail("Save data is damaged. Start a New Game.");
+      S = next;
+      return ok("Game loaded.");
+    } catch (err) {
+      return fail("Save data is unreadable. Start a New Game.");
+    }
+  }
+
+  function newGame() {
+    S = freshState();
+    note(`A new life begins with ${formatINR(CONFIG.START_CASH)} and an old phone.`);
+    return ok("New game started. Walk out of your Room and find work.");
+  }
+
+  // ----- Public API -----
+  return {
+    get state() { return S; },
+    MAP, ROWS, COLS, WORLD_W, WORLD_H,
+    here, hereName, clockText, stallExpected, jobLevel, jobSalary,
+    update, rest, applyForJob, quitJob, workShift,
+    startStall, openStall, upgradeStall,
+    deposit, withdraw, depositAll, withdrawAll,
+    endDay, save, load, newGame
+  };
+})();
+
+</script>
+<script>
+"use strict";
+/* ==========================================================================
+   EMPIRO — ui.js
+   Canvas rendering (town, player, minimap, day/night), side panels, keyboard
+   and touch input, the end-of-day summary, and the main game loop.
+   Rules live in game.js; this file only shows state and forwards actions.
+   ========================================================================== */
+
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const T = CONFIG.TILE;
+  const MINI_TILE = 6;
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => (
+    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+  ));
+
+  // ----- Shared UI state -----
+  let modalOpen = false;
+  let toastTimer = 0;
+  let last = 0;
+  let panelTimer = 0;
+  const boxes = {};                              // building key -> bounding box (tiles)
+  const keys = new Set();                        // held keys (KeyboardEvent.code)
+  const touch = { jx: 0, jy: 0, run: false };    // touch joystick + RUN button
+
+  // ----- Canvas setup -----
+  const canvas = $("world");
+  const ctx = canvas.getContext("2d");
+  const wrap = $("world-wrap");
+  const mini = $("minimap");
+  const mctx = mini.getContext("2d");
+  let viewW = 1;
+  let viewH = 1;
+  let dpr = 1;
+
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    const r = wrap.getBoundingClientRect();
+    viewW = Math.max(1, r.width);
+    viewH = Math.max(1, r.height);
+    canvas.width = Math.round(viewW * dpr);
+    canvas.height = Math.round(viewH * dpr);
+  }
+
+  function computeBoxes() {
+    for (let r = 0; r < Game.ROWS; r++) {
+      for (let c = 0; c < Game.COLS; c++) {
+        const ch = Game.MAP[r][c];
+        if (!LOCATIONS[ch]) continue;
+        const b = boxes[ch] || (boxes[ch] = { c0: c, r0: r, c1: c, r1: r });
+        b.c0 = Math.min(b.c0, c);
+        b.r0 = Math.min(b.r0, r);
+        b.c1 = Math.max(b.c1, c);
+        b.r1 = Math.max(b.r1, r);
+      }
+    }
+  }
+
+  function tileColor(ch) {
+    if (LOCATIONS[ch]) return LOCATIONS[ch].color;
+    if (TILES[ch]) return TILES[ch].color;
+    return TILES["."].color;
+  }
+
+  function drawTile(ch, x, y) {
+    if (LOCATIONS[ch]) {
+      ctx.fillStyle = LOCATIONS[ch].color;
+      ctx.fillRect(x, y, T, T);
+      ctx.fillStyle = "rgba(255,255,255,0.05)";
+      ctx.fillRect(x + 4, y + 4, T - 8, T - 8);
+      return;
+    }
+    ctx.fillStyle = TILES["."].color;            // every ground tile starts as grass
+    ctx.fillRect(x, y, T, T);
+    if (ch === "=") {
+      ctx.fillStyle = TILES["="].color;
+      ctx.fillRect(x, y, T, T);
+    } else if (ch === "t") {
+      ctx.fillStyle = "#1c3b26";
+      ctx.beginPath();
+      ctx.arc(x + T / 2, y + T / 2, T * 0.38, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#2f6b40";
+      ctx.beginPath();
+      ctx.arc(x + T / 2 - 5, y + T / 2 - 5, T * 0.2, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (ch === "h" || ch === "k") {
+      const info = TILES[ch];
+      ctx.fillStyle = info.color;
+      ctx.fillRect(x + 5, y + 10, T - 10, T - 12);
+      ctx.fillStyle = info.roof;
+      ctx.fillRect(x + 2, y + 3, T - 4, 9);
+      ctx.fillStyle = "rgba(255,230,160,0.55)";  // lit windows
+      ctx.fillRect(x + 12, y + 22, 8, 8);
+      ctx.fillRect(x + T - 20, y + 22, 8, 8);
+    }
+  }
+
+  function drawLabels() {
+    ctx.font = "bold 12px system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    for (const key of Object.keys(boxes)) {
+      const b = boxes[key];
+      const x = b.c0 * T;
+      const y = b.r0 * T;
+      const w = (b.c1 - b.c0 + 1) * T;
+      const h = (b.r1 - b.r0 + 1) * T;
+      ctx.strokeStyle = "rgba(255,255,255,0.4)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x + 1, y + 1, w - 2, h - 2);
+      const text = LOCATIONS[key].label;
+      const tw = ctx.measureText(text).width + 14;
+      ctx.fillStyle = "rgba(8,10,18,0.85)";
+      ctx.fillRect(x + w / 2 - tw / 2, y + 5, tw, 20);
+      ctx.fillStyle = "#e8f7ff";
+      ctx.fillText(text, x + w / 2, y + 15);
+    }
+  }
+
+  function drawPlayer(x, y) {
+    ctx.fillStyle = "rgba(0,0,0,0.35)";
+    ctx.beginPath();
+    ctx.ellipse(x, y + 11, 11, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.save();
+    ctx.shadowColor = "#00e5ff";
+    ctx.shadowBlur = 16;
+    ctx.fillStyle = "#00e5ff";
+    ctx.beginPath();
+    ctx.arc(x, y, 11, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 11px system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillText("YOU", x, y - 16);
+  }
+
+  // Night darkness for a given hour (0–24).
+  function nightAlpha(h) {
+    if (h < 5) return 0.6;
+    if (h < 7) return 0.6 * (7 - h) / 2;
+    if (h < 18) return 0;
+    if (h < 20) return 0.6 * (h - 18) / 2;
+    return 0.6;
+  }
+
+  function camera(pos, worldSize, viewSize) {
+    if (worldSize <= viewSize) return -(viewSize - worldSize) / 2;
+    return clamp(pos - viewSize / 2, 0, worldSize - viewSize);
+  }
+
+  function drawMinimap(st) {
+    for (let r = 0; r < Game.ROWS; r++) {
+      for (let c = 0; c < Game.COLS; c++) {
+        mctx.fillStyle = tileColor(Game.MAP[r][c]);
+        mctx.fillRect(c * MINI_TILE, r * MINI_TILE, MINI_TILE, MINI_TILE);
+      }
+    }
+    const px = (st.x / T) * MINI_TILE;
+    const py = (st.y / T) * MINI_TILE;
+    mctx.fillStyle = "#00e5ff";
+    mctx.beginPath();
+    mctx.arc(px, py, 3.5, 0, Math.PI * 2);
+    mctx.fill();
+  }
+
+  function draw() {
+    const st = Game.state;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = "#05070d";
+    ctx.fillRect(0, 0, viewW, viewH);
+
+    const camX = Math.round(camera(st.x, Game.WORLD_W, viewW));
+    const camY = Math.round(camera(st.y, Game.WORLD_H, viewH));
+    ctx.save();
+    ctx.translate(-camX, -camY);
+
+    const c0 = Math.max(0, Math.floor(camX / T));
+    const c1 = Math.min(Game.COLS - 1, Math.floor((camX + viewW) / T));
+    const r0 = Math.max(0, Math.floor(camY / T));
+    const r1 = Math.min(Game.ROWS - 1, Math.floor((camY + viewH) / T));
+    for (let r = r0; r <= r1; r++) {
+      for (let c = c0; c <= c1; c++) drawTile(Game.MAP[r][c], c * T, r * T);
+    }
+    drawLabels();
+    drawPlayer(st.x, st.y);
+    ctx.restore();
+
+    const a = nightAlpha(st.clock / 60);
+    if (a > 0) {
+      ctx.fillStyle = `rgba(4,8,30,${a.toFixed(3)})`;
+      ctx.fillRect(0, 0, viewW, viewH);
+    }
+    drawMinimap(st);
+  }
+
+  // ----- Input -----
+  const MOVE_KEYS = new Set([
+    "KeyW", "KeyA", "KeyS", "KeyD",
+    "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
+    "ShiftLeft", "ShiftRight"
+  ]);
+
+  function isTyping(e) {
+    const t = e.target;
+    return Boolean(t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT"));
+  }
+
+  window.addEventListener("keydown", (e) => {
+    if (isTyping(e) || !MOVE_KEYS.has(e.code)) return;
+    keys.add(e.code);
+    e.preventDefault();
+  });
+  window.addEventListener("keyup", (e) => keys.delete(e.code));
+  window.addEventListener("blur", () => keys.clear());
+
+  // Virtual joystick (touch screens).
+  const joy = $("joystick");
+  const knob = joy.querySelector(".knob");
+  let joyPointer = null;
+  let joyOrigin = { x: 0, y: 0 };
+
+  function setKnob(dx, dy) {
+    knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+  }
+
+  function joyMove(e) {
+    const max = joy.clientWidth * 0.36 || 45;
+    let dx = e.clientX - joyOrigin.x;
+    let dy = e.clientY - joyOrigin.y;
+    const d = Math.hypot(dx, dy);
+    if (d > max) {
+      dx *= max / d;
+      dy *= max / d;
+    }
+    setKnob(dx, dy);
+    let jx = dx / max;
+    let jy = dy / max;
+    if (Math.hypot(jx, jy) < 0.15) { jx = 0; jy = 0; }   // dead zone
+    touch.jx = jx;
+    touch.jy = jy;
+  }
+
+  function joyEnd(e) {
+    if (e.pointerId !== joyPointer) return;
+    joyPointer = null;
+    touch.jx = 0;
+    touch.jy = 0;
+    setKnob(0, 0);
+  }
+
+  joy.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    joyPointer = e.pointerId;
+    joy.setPointerCapture(e.pointerId);
+    const r = joy.getBoundingClientRect();
+    joyOrigin = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    joyMove(e);
+  });
+  joy.addEventListener("pointermove", (e) => { if (e.pointerId === joyPointer) joyMove(e); });
+  joy.addEventListener("pointerup", joyEnd);
+  joy.addEventListener("pointercancel", joyEnd);
+
+  // RUN button (hold to run).
+  const runBtn = $("btn-run");
+  const setRun = (on) => {
+    touch.run = on;
+    runBtn.classList.toggle("on", on);
+  };
+  runBtn.addEventListener("pointerdown", (e) => { e.preventDefault(); setRun(true); });
+  ["pointerup", "pointercancel", "pointerleave"].forEach((ev) => {
+    runBtn.addEventListener(ev, () => setRun(false));
+  });
+
+  function readInput() {
+    const pair = (a, b) => (keys.has(a) || keys.has(b) ? 1 : 0);
+    const x = clamp(pair("KeyD", "ArrowRight") - pair("KeyA", "ArrowLeft") + touch.jx, -1, 1);
+    const y = clamp(pair("KeyS", "ArrowDown") - pair("KeyW", "ArrowUp") + touch.jy, -1, 1);
+    const run = keys.has("ShiftLeft") || keys.has("ShiftRight") || touch.run;
+    return { x, y, run };
+  }
+
+  // ----- Panel rendering -----
+  const energyLabel = (e) => (
+    e > 70 ? "Fresh" : e > 40 ? "Okay" : e > 15 ? "Tired" : e > 0 ? "Exhausted" : "Running on empty"
+  );
+
+  const header = (title, sub) =>
+    `<div class="section-head"><h2>${esc(title)}</h2><p class="muted small">${esc(sub)}</p></div>`;
+
+  const card = (inner, extra = "") => `<div class="card ${extra}">${inner}</div>`;
+
+  function btn(label, act, o = {}) {
+    const dis = o.disabled ? "disabled" : "";
+    const hint = o.disabled && o.reason ? `<div class="hint">${esc(o.reason)}</div>` : "";
+    return `<button class="btn wide ${o.cls || ""}" data-act="${act}" ${o.attrs || ""} ${dis}>${esc(label)}</button>${hint}`;
+  }
+
+  // Only rewrite a panel when its markup actually changed, so buttons and the
+  // bank input are not destroyed between a press and its click.
+  function setHtml(el, html) {
+    if (el._sig !== html) {
+      el._sig = html;
+      el.innerHTML = html;
+    }
+  }
+
+  function jobCard(job, st) {
+    const mine = Boolean(st.job) && st.job.id === job.id;
+    const salary = mine ? Game.jobSalary(st.job) : job.salary;
+    let body = `
+      <div class="card-top"><b>${esc(job.name)}</b><span class="pill">${formatINR(salary)} / day</span></div>
+      <p class="muted small">${esc(job.desc)}</p>
+      <div class="kv-row"><span>${job.hours}-hour shift</span><span>−${job.energy} energy</span></div>`;
+
+    if (mine) {
+      const progress = st.job.xp % CONFIG.XP_PER_JOB_LEVEL;
+      const worked = st.job.lastWorkedDay === st.day;
+      const tooTired = st.energy < job.energy;
+      const noTime = st.clock + job.hours * 60 > CONFIG.DAY_END;
+      body += `
+        <div class="kv-row"><span>Level ${Game.jobLevel(st.job)}</span><span>${progress} / ${CONFIG.XP_PER_JOB_LEVEL} XP</span></div>
+        <div class="bar thin"><div class="fill xp" style="width:${progress}%"></div></div>
+        ${btn(worked ? "Shift done for today" : "Clock in shift", "shift", {
+          cls: "gold",
+          disabled: worked || tooTired || noTime,
+          reason: worked
+            ? "Come back tomorrow for your next shift."
+            : tooTired
+              ? `Needs ${job.energy} energy — rest in your Room first.`
+              : "Not enough time left in the day for this shift."
+        })}
+        ${btn("Quit job", "quit", { cls: "ghost" })}`;
+    } else if (st.job) {
+      body += `<div class="hint">You already work as a ${esc(JOBS[st.job.id].name)}. Quit that job first.</div>`;
+    } else {
+      body += btn("Apply for this job", "apply", { attrs: `data-job="${job.id}"` });
+    }
+    return card(body, mine ? "active" : "");
+  }
+
+  function jobCards(loc, st) {
+    const list = Object.values(JOBS).filter((j) => j.location === loc);
+    return list.length
+      ? list.map((j) => jobCard(j, st)).join("")
+      : `<p class="muted small">Nobody is hiring here.</p>`;
+  }
+
+  function stallCard(st) {
+    const c = CONFIG.STALL;
+    if (!st.stall) {
+      const reason = !st.everEmployed
+        ? "Earn your first salary before investing in a business."
+        : `You need ${formatINR(c.INVESTMENT)} cash in hand. You have ${formatINR(st.cash)} — withdraw from the Bank if needed.`;
+      return card(
+        `<p class="muted small">Serve chai to the whole street. Investment: <b>${formatINR(c.INVESTMENT)}</b> from cash.</p>` +
+        btn(`Start tea stall — ${formatINR(c.INVESTMENT)}`, "stallStart", {
+          cls: "gold",
+          disabled: !st.everEmployed || st.cash < c.INVESTMENT,
+          reason
+        })
+      );
+    }
+
+    const sb = st.stall;
+    const exp = Game.stallExpected();
+    const openToday = sb.openedDay === st.day;
+    const maxed = sb.level >= c.MAX_LEVEL;
+    const upCost = c.UPGRADE_BASE * sb.level;
+
+    let report = `<div class="hint">No trading days yet.</div>`;
+    if (sb.lastReport) {
+      report = sb.lastReport.opened
+        ? `<div class="hint">Last trading day: ${sb.lastReport.customers} customers · sales ${formatINR(sb.lastReport.sales)} · profit ${formatINR(sb.lastReport.profit)}</div>`
+        : `<div class="hint">Last day the stall stayed closed.</div>`;
+    }
+
+    return card(`
+      <div class="kv-row"><span>Business level</span><b>${sb.level} / ${c.MAX_LEVEL}</b></div>
+      <div class="kv-row"><span>Reputation</span><b>${Math.round(st.reputation)} / 100</b></div>
+      <div class="kv-row"><span>Expected customers</span><b>${exp.customers}</b></div>
+      <div class="kv-row"><span>Expected sales</span><b>${formatINR(exp.sales)}</b></div>
+      <div class="kv-row"><span>Stock cost</span><b>${formatINR(exp.stock)}</b></div>
+      <div class="kv-row good"><span>Expected profit</span><b>${formatINR(exp.sales - exp.stock)}</b></div>
+      ${btn(openToday ? "Stall open today ✓" : "Open stall for today", "stallOpen", {
+        cls: "gold",
+        disabled: openToday || st.energy < c.OPEN_ENERGY,
+        reason: openToday ? "Sales settle at the end of the day." : "Too tired — rest first."
+      })}
+      ${btn(maxed ? "Top level reached" : `Upgrade stall — ${formatINR(upCost)}`, "stallUpgrade", {
+        disabled: maxed || st.cash < upCost,
+        reason: maxed ? "" : `You need ${formatINR(upCost)} cash.`
+      })}
+      <div class="kv-row"><span>Lifetime sales</span><b>${formatINR(sb.totalSales)}</b></div>
+      <div class="kv-row"><span>Lifetime profit</span><b>${formatINR(sb.totalProfit)}</b></div>
+      ${report}`);
+  }
+
+  function roomPanel(st) {
+    const full = st.energy >= CONFIG.MAX_ENERGY;
+    return header("Your Room", "A small rented room with a fan, a cot and an old phone.") +
+      card(`
+        <div class="kv-row"><span>Energy</span><b>${energyLabel(st.energy)}</b></div>
+        <div class="kv-row"><span>Rent & food</span><b>${formatINR(CONFIG.LIVING_COST_PER_DAY)} / day</b></div>`) +
+      btn(`Rest 1 hour (+${CONFIG.REST_ENERGY} energy)`, "rest", { disabled: full, reason: "You are already fully rested." }) +
+      btn("Go to sleep — end the day", "sleep", { cls: "gold" }) +
+      `<p class="hint">Sleeping wakes you here at home, restores energy and settles today's bills and business.</p>`;
+  }
+
+  function marketPanel(st) {
+    return header("Market", "Busy stalls, bargains and the best chai in town.") +
+      `<h3>Jobs</h3>` + jobCards("M", st) +
+      `<h3>Tea stall</h3>` + stallCard(st);
+  }
+
+  function officePanel(st) {
+    const future = STAGES.filter((s) => s.phase === 2)
+      .map((s) => `<div class="locked-line">🔒 ${esc(s.name)} — Stage ${s.id}</div>`)
+      .join("");
+    return header("Office", "The delivery hub. Bigger plans are being drawn up on the whiteboard.") +
+      `<h3>Jobs</h3>` + jobCards("O", st) +
+      `<h3>Future opportunities</h3>` +
+      card(future + `<p class="hint">Coming in Phase 2.</p>`);
+  }
+
+  function bankPanel(st) {
+    return header("Bank", `Keep savings safe. Reaching ${formatINR(CONFIG.BANK_GOAL)} unlocks Stage 3.`) +
+      card(`
+        <div class="kv-row"><span>Cash in hand</span><b>${formatINR(st.cash)}</b></div>
+        <div class="kv-row"><span>Bank balance</span><b>${formatINR(st.bank)}</b></div>
+        <input id="bank-amount" class="input" type="number" min="1" step="100" inputmode="numeric" placeholder="Amount in ₹">`) +
+      `<div class="grid2">
+        ${btn("Deposit", "deposit", { cls: "gold" })}
+        ${btn("Deposit all", "depositAll")}
+        ${btn("Withdraw", "withdraw")}
+        ${btn("Withdraw all", "withdrawAll")}
+      </div>`;
+  }
+
+  function streetPanel() {
+    return header(Game.hereName(), "Out on the street. Walk into a building to see what it offers.") +
+      card(`<p class="muted small">Homes, local shops and the Market line the road. Visit your Room to rest, the Market for jobs and your tea stall, the Workshop and the Office for work, and the Bank to save.</p>`);
+  }
+
+  function renderHere() {
+    const st = Game.state;
+    const loc = Game.here();
+    let html;
+    if (loc === "R") html = roomPanel(st);
+    else if (loc === "M") html = marketPanel(st);
+    else if (loc === "W") html = header("Workshop", "Machines, oil and long shifts.") + `<h3>Jobs</h3>` + jobCards("W", st);
+    else if (loc === "O") html = officePanel(st);
+    else if (loc === "B") html = bankPanel(st);
+    else html = streetPanel();
+    setHtml($("tab-here"), html);
+  }
+
+  function renderMoney() {
+    const st = Game.state;
+    const t = st.today;
+    const income = t.jobPay + t.sales;
+    const expenses = t.stock + CONFIG.LIVING_COST_PER_DAY;
+    const lifetime = st.stall ? st.stall.totalProfit : 0;
+    const last = st.lastSummary;
+    const logItems = st.log.slice(0, 15).map((l) => `<li>${esc(l)}</li>`).join("") ||
+      `<li class="muted">Nothing has happened yet.</li>`;
+
+    let lastHtml = "";
+    if (last) {
+      lastHtml = `<h3>Last closed day · Day ${last.day}</h3>` + card(`
+        <div class="kv-row ${last.net >= 0 ? "good" : "bad"}"><span>Net</span><b>${formatINR(last.net)}</b></div>
+        <div class="kv-row"><span>Income / expenses</span><b>${formatINR(last.income)} / ${formatINR(last.expenses)}</b></div>`);
+    }
+
+    setHtml($("tab-money"),
+      header("Money", "Cash in hand, savings and today's books.") +
+      card(`
+        <div class="kv-row"><span>Cash in hand</span><b>${formatINR(st.cash)}</b></div>
+        <div class="kv-row"><span>Bank balance</span><b>${formatINR(st.bank)}</b></div>
+        <div class="kv-row"><span>Net worth</span><b>${formatINR(st.cash + st.bank)}</b></div>`) +
+      `<h3>Today · Day ${st.day}</h3>` +
+      card(`
+        <div class="kv-row good"><span>Daily income</span><b>${formatINR(income)}</b></div>
+        <div class="kv-row bad"><span>Daily expenses</span><b>${formatINR(expenses)}</b></div>
+        <p class="hint">Expenses include ${formatINR(CONFIG.LIVING_COST_PER_DAY)} living costs, charged at day end.</p>
+        <div class="kv-row"><span>Business profit today</span><b>${formatINR(t.sales - t.stock)}</b></div>
+        <div class="kv-row"><span>Business profit lifetime</span><b>${formatINR(lifetime)}</b></div>`) +
+      lastHtml +
+      `<h3>Activity log</h3>` + card(`<ul class="log">${logItems}</ul>`)
+    );
+  }
+
+  function renderCareer() {
+    const st = Game.state;
+    let jobHtml;
+    if (st.job) {
+      const j = JOBS[st.job.id];
+      const progress = st.job.xp % CONFIG.XP_PER_JOB_LEVEL;
+      jobHtml = card(`
+        <div class="card-top"><b>${esc(j.name)}</b><span class="pill">${formatINR(Game.jobSalary(st.job))} / day</span></div>
+        <div class="kv-row"><span>Workplace</span><b>${esc(LOCATIONS[j.location].name)}</b></div>
+        <div class="kv-row"><span>Level</span><b>${Game.jobLevel(st.job)}</b></div>
+        <div class="kv-row"><span>Total experience</span><b>${st.job.xp} XP</b></div>
+        <div class="bar thin"><div class="fill xp" style="width:${progress}%"></div></div>
+        <p class="hint">${CONFIG.XP_PER_JOB_LEVEL - progress} XP to the next level (+5% salary).</p>`);
+    } else {
+      jobHtml = card(`<p class="muted small">Unemployed. Find work at the Market (Shop Worker), the Workshop (Workshop Worker) or the Office (Delivery Worker).</p>`);
+    }
+
+    const stageHtml = STAGES.map((s) => {
+      const cls = s.id < st.stage ? "done" : s.id === st.stage ? "now" : s.phase === 2 ? "locked" : "todo";
+      const tag = s.phase === 2 ? ` <em>Phase 2</em>` : "";
+      return `<div class="stage ${cls}"><span>${s.id}</span>${esc(s.name)}${tag}</div>`;
+    }).join("");
+
+    setHtml($("tab-career"),
+      header("Career", "Land a job, keep it, climb the ladder.") +
+      jobHtml +
+      `<h3>Journey</h3>` + card(stageHtml) +
+      `<h3>Stats</h3>` + card(`
+        <div class="kv-row"><span>Shifts worked</span><b>${st.stats.shifts}</b></div>
+        <div class="kv-row"><span>Total earned from salaries</span><b>${formatINR(st.stats.totalEarned)}</b></div>
+        <div class="kv-row"><span>Days completed</span><b>${st.stats.daysCompleted}</b></div>`)
+    );
+  }
+
+  function refreshHud() {
+    const st = Game.state;
+    $("hud-day").textContent = st.day;
+    $("hud-clock").textContent = Game.clockText(st.clock);
+    const cash = $("hud-cash");
+    cash.textContent = formatINR(st.cash);
+    cash.classList.toggle("neg", st.cash < 0);
+    $("hud-bank").textContent = formatINR(st.bank);
+    $("hud-energy").style.width = clamp(st.energy, 0, 100) + "%";
+    $("hud-energy-txt").textContent = Math.round(st.energy) + "%";
+    $("hud-rep").style.width = clamp(st.reputation, 0, 100) + "%";
+    $("hud-rep-txt").textContent = Math.round(st.reputation);
+    const stage = STAGES[st.stage - 1];
+    $("hud-stage").textContent = stage ? `${st.stage} · ${stage.name}` : String(st.stage);
+    $("hud-loc").textContent = Game.hereName();
+  }
+
+  function refreshAll() {
+    refreshHud();
+    renderHere();
+    renderMoney();
+    renderCareer();
+  }
+
+  // ----- Toasts and the end-of-day summary -----
+  function toast(msg, good = true) {
+    if (!msg) return;
+    const el = $("toast");
+    el.textContent = msg;
+    el.className = "toast show " + (good ? "good" : "bad");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
+  }
+
+  function showSummary(s) {
+    const row = (label, val, cls = "") => `<div class="kv-row ${cls}"><span>${label}</span><b>${val}</b></div>`;
+    const stallLine = !s.stall ? "No stall" : s.stall.opened ? "Opened" : "Stayed closed";
+    const netText = (s.net >= 0 ? "+" : "−") + formatINR(Math.abs(s.net));
+    $("modal-title").textContent = `Day ${s.day} complete`;
+    $("modal-body").innerHTML = [
+      row("Job salary", formatINR(s.jobPay)),
+      row("Tea stall sales", formatINR(s.sales)),
+      row("Income", formatINR(s.income), "good"),
+      row("Stock bought", formatINR(s.stock)),
+      row("Living costs", formatINR(s.living)),
+      row("Expenses", formatINR(s.expenses), "bad"),
+      row("Net", netText, s.net >= 0 ? "good" : "bad"),
+      row("Business profit", s.stall ? formatINR(s.stall.profit) : "—"),
+      row("Stall", stallLine),
+      `<hr>`,
+      row("Cash", formatINR(s.cash)),
+      row("Bank", formatINR(s.bank)),
+      row("Reputation", Math.round(s.reputation)),
+      `<p class="muted small">${s.outside
+        ? "You collapsed outside and were carried home. Energy partly restored."
+        : "You slept well at home. Energy restored."}</p>`
+    ].join("");
+    modalOpen = true;
+    $("modal").classList.remove("hidden");
+  }
+
+  $("modal-close").addEventListener("click", () => {
+    modalOpen = false;
+    $("modal").classList.add("hidden");
+    refreshAll();
+  });
+
+  // ----- Panel actions -----
+  const bankInput = () => {
+    const el = $("bank-amount");
+    return el ? el.value : 0;
+  };
+
+  const ACTIONS = {
+    rest: () => Game.rest(),
+    sleep: () => { showSummary(Game.endDay()); return null; },
+    apply: (d) => Game.applyForJob(d.job),
+    quit: () => Game.quitJob(),
+    shift: () => Game.workShift(),
+    stallStart: () => Game.startStall(),
+    stallOpen: () => Game.openStall(),
+    stallUpgrade: () => Game.upgradeStall(),
+    deposit: () => Game.deposit(bankInput()),
+    withdraw: () => Game.withdraw(bankInput()),
+    depositAll: () => Game.depositAll(),
+    withdrawAll: () => Game.withdrawAll()
+  };
+
+  function runAction(d) {
+    const fn = ACTIONS[d.act];
+    if (!fn) return;
+    const res = fn(d);
+    if (res) toast(res.msg, res.ok);
+    refreshAll();
+  }
+
+  document.querySelector(".panel").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-act]");
+    if (!b || b.disabled) return;
+    runAction(b.dataset);
+  });
+
+  // ----- Tabs and header buttons -----
+  document.querySelectorAll(".tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t === tab));
+      document.querySelectorAll(".tab-body").forEach((p) => {
+        p.classList.toggle("hidden", p.id !== "tab-" + tab.dataset.tab);
+      });
+    });
+  });
+
+  $("btn-endday").addEventListener("click", () => {
+    showSummary(Game.endDay());
+    refreshAll();
+  });
+
+  $("btn-save").addEventListener("click", () => {
+    const r = Game.save();
+    toast(r.msg, r.ok);
+  });
+
+  $("btn-load").addEventListener("click", () => {
+    const r = Game.load();
+    toast(r.msg, r.ok);
+    refreshAll();
+  });
+
+  // The viewer's sandbox blocks confirm(), so New Game needs a second tap.
+  let newGameArmedUntil = 0;
+  $("btn-new").addEventListener("click", () => {
+    const b = $("btn-new");
+    if (Date.now() > newGameArmedUntil) {
+      newGameArmedUntil = Date.now() + 4000;
+      b.textContent = "Tap again to erase";
+      toast("Tap New Game again within 4 seconds to erase your progress.", false);
+      setTimeout(() => { if (Date.now() >= newGameArmedUntil) b.textContent = "New Game"; }, 4100);
+      return;
+    }
+    newGameArmedUntil = 0;
+    b.textContent = "New Game";
+    const r = Game.newGame();
+    toast(r.msg, r.ok);
+    refreshAll();
+  });
+
+  // ----- Main loop -----
+  function frame(now) {
+    const dt = clamp((now - last) / 1000, 0, 0.05);
+    last = now;
+
+    if (!modalOpen) {
+      const res = Game.update(dt, readInput());
+      if (res && res.summary) showSummary(res.summary);
+    }
+
+    draw();
+
+    panelTimer += dt;
+    if (panelTimer > 0.2) {
+      panelTimer = 0;
+      refreshAll();
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function init() {
+    resize();
+    window.addEventListener("resize", resize);
+    computeBoxes();
+    mini.width = Game.COLS * MINI_TILE;
+    mini.height = Game.ROWS * MINI_TILE;
+
+    const r = Game.load();
+    if (r.ok) toast("Saved game loaded. Use New Game for a fresh start.", true);
+    else if (r.msg !== "No saved game found.") toast(r.msg, false);
+    else toast("Welcome to EMPIRO. Walk out of your Room and head to the Market.", true);
+
+    refreshAll();
+    last = performance.now();
+    requestAnimationFrame(frame);
+  }
+
+  init();
+})();
+
+</script>
+
+</body></html>
